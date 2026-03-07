@@ -48,6 +48,7 @@ public class GameWindow extends JFrame implements ActionListener {
         this.setTitle(Configuration.CLIENT_NAME);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.setFocusTraversalKeysEnabled(false);
+        this.setResizable(true);
         this.getContentPane().setBackground(Color.BLACK);
 
         GridBagLayout gbl_contentPane = new GridBagLayout();
@@ -69,7 +70,7 @@ public class GameWindow extends JFrame implements ActionListener {
         this.getContentPane().add(appletInstance, gbc_panel);
 
         this.pack();
-        this.setMinimumSize(this.getSize());
+        this.setMinimumSize(new Dimension(765 + getInsets().left + getInsets().right, 503 + getInsets().top + getInsets().bottom));
         this.setVisible(true);
 
         this.requestFocus();

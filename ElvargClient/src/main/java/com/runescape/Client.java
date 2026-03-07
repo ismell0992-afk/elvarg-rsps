@@ -1057,7 +1057,7 @@ public class Client extends GameApplet {
             cameraZoom = 600;
             SceneGraph.viewDistance = 9;
         } else if (screenMode == ScreenMode.RESIZABLE) {
-            cameraZoom = 850;
+            cameraZoom = 600;
             SceneGraph.viewDistance = 10;
         } else if (screenMode == ScreenMode.FULLSCREEN) {
             cameraZoom = 600;
@@ -1114,7 +1114,7 @@ public class Client extends GameApplet {
         if (frameMode == ScreenMode.RESIZABLE && (frameWidth >= 765) && (frameWidth <= 1025)
                 && (frameHeight >= 503) && (frameHeight <= 850)) {
             SceneGraph.viewDistance = 9;
-            cameraZoom = 575;
+            cameraZoom = 600;
         } else if (frameMode == ScreenMode.FIXED) {
             cameraZoom = 600;
         } else if (frameMode == ScreenMode.RESIZABLE || frameMode == ScreenMode.FULLSCREEN) {
@@ -6769,16 +6769,16 @@ public class Client extends GameApplet {
                     Client.cameraZoom = 1200;
                     break;
                 case 931:
-                    Client.cameraZoom = 800;
+                    Client.cameraZoom = 900;
                     break;
                 case 932:
-                    Client.cameraZoom = 400;
+                    Client.cameraZoom = 600;
                     break;
                 case 933:
-                    Client.cameraZoom = 200;
+                    Client.cameraZoom = 400;
                     break;
                 case 934:
-                    Client.cameraZoom = 0;
+                    Client.cameraZoom = 200;
                     break;
                 case 32506:
                     Bank.bankTabShow = BankTabShow.FIRST_ITEM_IN_TAB;
