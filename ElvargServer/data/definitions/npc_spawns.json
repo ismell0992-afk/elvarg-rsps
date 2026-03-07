@@ -3196,5 +3196,71 @@
       "y": 3089,
       "z": 0
     }
+  },
+  {
+    "facing": "SOUTH",
+    "radius": 0,
+    "id": 306,
+    "position": {
+      "x": 3092,
+      "y": 3524,
+      "z": 0
+    },
+    "description": "Harbour Master (Ironhaven)"
+  },
+  {
+    "facing": "SOUTH",
+    "radius": 0,
+    "id": 276,
+    "position": {
+      "x": 3089,
+      "y": 3524,
+      "z": 0
+    },
+    "description": "Town Crier (Ironhaven)"
+  },
+  {
+    "facing": "WEST",
+    "radius": 0,
+    "id": 15,
+    "position": {
+      "x": 3082,
+      "y": 3520,
+      "z": 0
+    },
+    "description": "Ironhaven Blacksmith"
+  },
+  {
+    "facing": "WEST",
+    "radius": 0,
+    "id": 782,
+    "position": {
+      "x": 3098,
+      "y": 3524,
+      "z": 0
+    },
+    "description": "Expedition Guide (Ironhaven)"
+  },
+  {
+    "facing": "SOUTH",
+    "radius": 2,
+    "id": 3934,
+    "position": {
+      "x": 3087,
+      "y": 3530,
+      "z": 0
+    },
+    "description": "Harbour Fisherman (Ironhaven)"
+  },
+  {
+    "facing": "SOUTH",
+    "radius": 0,
+    "id": 1328,
+    "position": {
+      "x": 3090,
+      "y": 3530,
+      "z": 0
+    },
+    "description": "Harbour Trader (Ironhaven)"
   }
 ]
