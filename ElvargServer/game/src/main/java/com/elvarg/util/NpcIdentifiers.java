@@ -7487,8 +7487,8 @@ public class NpcIdentifiers {
     public static final int ZOMBIE_87 = 7487;
     public static final int ZOMBIE_88 = 7488;
     public static final int NULL_599 = 7489;
-    public static final int _22 = 7490;
-    public static final int _23 = 7491;
+    public static final int TIDECALLER_ZHARVEK = 7490;
+    public static final int TIDE_REAVER = 7491;
     public static final int HOLLY_2 = 7492;
     public static final int HOLLY_3 = 7493;
     public static final int IVY = 7494;

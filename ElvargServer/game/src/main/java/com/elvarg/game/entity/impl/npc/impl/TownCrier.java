@@ -1,6 +1,7 @@
 package com.elvarg.game.entity.impl.npc.impl;
 
 import com.elvarg.game.World;
+import com.elvarg.game.content.TidecallerEvent;
 import com.elvarg.game.entity.impl.npc.NPC;
 import com.elvarg.game.entity.impl.npc.NPCInteraction;
 import com.elvarg.game.entity.impl.npc.ai.NPCState;
@@ -146,7 +147,11 @@ public class TownCrier extends NPC implements NPCInteraction {
      * server state (world boss timers, events, etc.).
      */
     private void broadcastMessage() {
-        // Default broadcast — can be extended with event checks
+        if (TidecallerEvent.isActive()) {
+            World.sendMessage("[Town Crier] Hear ye! Tidecaller Zharvek terrorizes the Tidal Isle! "
+                    + "Brave warriors, rally to defeat the beast!");
+            return;
+        }
         String message = "[Town Crier] Hear ye! Ironhaven stands strong. "
                 + "No events at present.";
         World.sendMessage(message);
@@ -166,11 +171,19 @@ public class TownCrier extends NPC implements NPCInteraction {
 
         @Override
         public void build(Player player) {
-            add(new NpcDialogue(0, TOWN_CRIER,
-                    "Hear ye, hear ye! Ironhaven stands strong today."));
-            add(new NpcDialogue(1, TOWN_CRIER,
-                    "No events at present. Check back soon, traveller."));
-            add(new EndDialogue(2));
+            if (TidecallerEvent.isActive()) {
+                add(new NpcDialogue(0, TOWN_CRIER,
+                        "Hear ye! Tidecaller Zharvek has risen at the Tidal Isle!"));
+                add(new NpcDialogue(1, TOWN_CRIER,
+                        "Gather your allies and face the beast before it's too late!"));
+                add(new EndDialogue(2));
+            } else {
+                add(new NpcDialogue(0, TOWN_CRIER,
+                        "Hear ye, hear ye! Ironhaven stands strong today."));
+                add(new NpcDialogue(1, TOWN_CRIER,
+                        "No events at present. Check back soon, traveller."));
+                add(new EndDialogue(2));
+            }
         }
     }
 }
