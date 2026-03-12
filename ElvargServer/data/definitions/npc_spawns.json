@@ -3262,5 +3262,49 @@
       "z": 0
     },
     "description": "Harbour Trader (Ironhaven)"
+  },
+  {
+    "id": 47,
+    "position": {
+      "x": 3236,
+      "y": 3221,
+      "z": 0
+    },
+    "facing": "NORTH",
+    "radius": 0,
+    "description": "Zombie"
+  },
+  {
+    "id": 47,
+    "position": {
+      "x": 3236,
+      "y": 3216,
+      "z": 0
+    },
+    "facing": "NORTH",
+    "radius": 0,
+    "description": "Zombie"
+  },
+  {
+    "id": 47,
+    "position": {
+      "x": 3318,
+      "y": 3257,
+      "z": 0
+    },
+    "facing": "NORTH",
+    "radius": 0,
+    "description": "Zombie"
+  },
+  {
+    "id": 47,
+    "position": {
+      "x": 3317,
+      "y": 3255,
+      "z": 0
+    },
+    "facing": "NORTH",
+    "radius": 0,
+    "description": "Zombie"
   }
 ]
