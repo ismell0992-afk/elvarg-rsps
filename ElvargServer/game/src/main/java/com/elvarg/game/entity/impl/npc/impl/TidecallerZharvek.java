@@ -5,20 +5,30 @@ import com.elvarg.game.content.TidecallerEvent;
 import com.elvarg.game.content.combat.hit.PendingHit;
 import com.elvarg.game.content.combat.method.CombatMethod;
 import com.elvarg.game.content.combat.method.impl.npcs.TidecallerCombatMethod;
+import com.elvarg.game.definition.NpcDropDefinition;
+import com.elvarg.game.definition.NpcDropDefinition.NPCDrop;
 import com.elvarg.game.entity.impl.Mobile;
+import com.elvarg.game.entity.impl.grounditem.ItemOnGroundManager;
 import com.elvarg.game.entity.impl.npc.NPC;
+import com.elvarg.game.entity.impl.npc.NPCDropGenerator;
 import com.elvarg.game.entity.impl.npc.NPCInteraction;
 import com.elvarg.game.entity.impl.npc.ai.BehaviorNode.Status;
 import com.elvarg.game.entity.impl.npc.ai.BehaviorTree;
 import com.elvarg.game.entity.impl.player.Player;
 import com.elvarg.game.model.Ids;
+import com.elvarg.game.model.Item;
 import com.elvarg.game.model.Location;
 import com.elvarg.game.model.dialogues.builders.DynamicDialogueBuilder;
 import com.elvarg.game.model.dialogues.entries.impl.EndDialogue;
 import com.elvarg.game.model.dialogues.entries.impl.NpcDialogue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import static com.elvarg.util.NpcIdentifiers.TIDECALLER_ZHARVEK;
 import static com.elvarg.util.NpcIdentifiers.TIDE_REAVER;
@@ -41,6 +51,7 @@ public class TidecallerZharvek extends NPC implements NPCInteraction {
 
     private final BehaviorTree tree;
     private final List<TideReaver> activeMinions = new ArrayList<>();
+    private final Map<Player, Integer> damageTracker = new HashMap<>();
 
     private int currentPhase = 1;
     private int ticksSinceAoe = 0;
@@ -52,7 +63,7 @@ public class TidecallerZharvek extends NPC implements NPCInteraction {
     // Phase 1: Tidal Wave
     private static final int PHASE1_AOE_INTERVAL = 12;
     private static final int PHASE1_AOE_RADIUS = 5;
-    private static final int PHASE1_AOE_MAX_DAMAGE = 20;
+    private static final int PHASE1_AOE_MAX_DAMAGE = 18;
 
     // Phase 2: Lightning Strike
     private static final int PHASE2_AOE_INTERVAL = 10;
@@ -62,8 +73,9 @@ public class TidecallerZharvek extends NPC implements NPCInteraction {
     // Phase 3: Whirlpool
     private static final int PHASE3_AOE_INTERVAL = 8;
     private static final int PHASE3_AOE_RADIUS = 4;
-    private static final int PHASE3_AOE_MAX_DAMAGE = 35;
-    private static final int PHASE3_HEAL_PER_HIT = 1;
+    private static final int PHASE3_AOE_MAX_DAMAGE = 30;
+    private static final int PHASE3_HEAL_PER_HIT = 2;
+    private static final double PHASE3_DAMAGE_MULTIPLIER = 0.30; // 70% damage reduction
 
     public TidecallerZharvek(int id, Location position) {
         super(id, position);
@@ -195,9 +207,15 @@ public class TidecallerZharvek extends NPC implements NPCInteraction {
     @Override
     public PendingHit manipulateHit(PendingHit hit) {
         if (currentPhase == 3) {
-            int reduced = (int) (hit.getTotalDamage() * 0.70);
+            int reduced = (int) (hit.getTotalDamage() * PHASE3_DAMAGE_MULTIPLIER);
             hit.setTotalDamage(reduced);
         }
+
+        if (hit.getAttacker() != null && hit.getAttacker().isPlayer() && hit.getTotalDamage() > 0) {
+            Player attacker = (Player) hit.getAttacker();
+            damageTracker.merge(attacker, hit.getTotalDamage(), Integer::sum);
+        }
+
         return hit;
     }
 
@@ -205,6 +223,37 @@ public class TidecallerZharvek extends NPC implements NPCInteraction {
 
     @Override
     public void appendDeath() {
+        Player topDamager = getTopDamager();
+
+        if (topDamager != null) {
+            Optional<NpcDropDefinition> def = NpcDropDefinition.get(getId());
+            if (def.isPresent()) {
+                NPCDropGenerator gen = new NPCDropGenerator(topDamager, def.get());
+                List<Item> drops = gen.getDropList();
+
+                Set<Integer> rareItemIds = buildRareItemIdSet(def.get());
+
+                for (Item item : drops) {
+                    if (!item.getDefinition().isStackable()) {
+                        for (int i = 0; i < item.getAmount(); i++) {
+                            ItemOnGroundManager.register(topDamager, new Item(item.getId(), 1), getLocation());
+                        }
+                    } else {
+                        ItemOnGroundManager.register(topDamager, item, getLocation());
+                    }
+
+                    if (rareItemIds.contains(item.getId())) {
+                        World.sendMessage("@dre@" + topDamager.getUsername()
+                                + " received a rare drop from Tidecaller Zharvek!");
+                    }
+                }
+            }
+
+            // Consume and clear the combat damage map so NPCDeathTask
+            // doesn't find a killer and generate duplicate drops
+            getCombat().getKiller(true);
+        }
+
         despawnAllMinions();
         super.appendDeath();
         TidecallerEvent.endEvent();
@@ -229,6 +278,15 @@ public class TidecallerZharvek extends NPC implements NPCInteraction {
     @Override
     public void useItemOnNpc(Player player, NPC npc, int itemId, int slot) {}
 
+    /**
+     * Force-removes the boss and all minions from the world without a death animation.
+     * Used by admin stop commands.
+     */
+    public void forceRemove() {
+        despawnAllMinions();
+        World.getRemoveNPCQueue().add(this);
+    }
+
     // ── Getters ──
 
     public int getCurrentPhase() {
@@ -236,6 +294,33 @@ public class TidecallerZharvek extends NPC implements NPCInteraction {
     }
 
     // ── Helpers ──
+
+    public Player getTopDamager() {
+        Player top = null;
+        int maxDamage = 0;
+        for (Map.Entry<Player, Integer> entry : damageTracker.entrySet()) {
+            if (entry.getValue() > maxDamage) {
+                maxDamage = entry.getValue();
+                top = entry.getKey();
+            }
+        }
+        return top;
+    }
+
+    private static Set<Integer> buildRareItemIdSet(NpcDropDefinition def) {
+        Set<Integer> ids = new HashSet<>();
+        if (def.getRareDrops() != null) {
+            for (NPCDrop drop : def.getRareDrops()) {
+                ids.add(drop.getItemId());
+            }
+        }
+        if (def.getVeryRareDrops() != null) {
+            for (NPCDrop drop : def.getVeryRareDrops()) {
+                ids.add(drop.getItemId());
+            }
+        }
+        return ids;
+    }
 
     private static int hpPercent(NPC npc) {
         return (npc.getHitpoints() * 100) / npc.getDefinition().getHitpoints();

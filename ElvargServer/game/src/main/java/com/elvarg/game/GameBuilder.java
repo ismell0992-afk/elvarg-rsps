@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 
 import com.elvarg.game.collision.RegionManager;
+import com.elvarg.game.content.TidecallerEvent;
 import com.elvarg.game.content.clan.ClanChatManager;
 import com.elvarg.game.content.minigames.MinigameHandler;
 import com.elvarg.game.definition.loader.impl.*;
@@ -52,6 +53,9 @@ public class GameBuilder {
         // Make sure the background tasks loaded properly..
         if (!backgroundLoader.awaitCompletion())
             throw new IllegalStateException("Background load did not complete normally!");
+
+        // Start world boss auto-scheduler (requires NPC definitions to be loaded)
+        TidecallerEvent.initDefaultScheduler();
     }
 
     /**

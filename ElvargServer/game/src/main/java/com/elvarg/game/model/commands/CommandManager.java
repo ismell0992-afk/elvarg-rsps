@@ -105,6 +105,7 @@ public class CommandManager {
         put(new UpdateServer(), "update");
         put(new AreaDebug(), "area");
         put(new InfiniteHealth(), "infhp");
+        put(new TidecallerCommand(), "tidecaller", "worldboss");
         put(new TaskDebug(), "taskdebug");
         put(new Noclip(), "noclip");
         put(new Up(), "up");

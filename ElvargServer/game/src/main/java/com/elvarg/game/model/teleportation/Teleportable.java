@@ -18,7 +18,8 @@ public enum Teleportable {
 	VENENATIS(TeleportButton.BOSSES, 2, 6, new Location(3346, 3727)),
 	VET_ION(TeleportButton.BOSSES, 2, 7, new Location(3187, 3787)),
 	CALLISTO(TeleportButton.BOSSES, 2, 8, new Location(3312, 3830)),
-	
+	TIDECALLER_ZHARVEK(TeleportButton.BOSSES, 2, 9, new Location(3420, 3440)),
+
 	DUEL_ARENA(TeleportButton.MINIGAME, 1, 0, new Location(3370, 3270)),
 	BARROWS(TeleportButton.MINIGAME, 1, 1, new Location(3565, 3313)),
 	FIGHT_CAVES(TeleportButton.MINIGAME, 1, 2, new Location(2439, 5171)),
